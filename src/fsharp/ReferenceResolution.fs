@@ -26,7 +26,7 @@ module internal MSBuildResolver =
             
     type ResolutionEnvironment = CompileTimeLike | RuntimeLike | DesigntimeLike
     
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
     open System
     open System.Reflection

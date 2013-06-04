@@ -15,6 +15,7 @@
     <AssemblyName>FSharp.Compiler.Silverlight</AssemblyName>
     <DefineConstants>EXTENSIONTYPING</DefineConstants>
     <DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
+    <DefineConstants>$(DefineConstants);HOSTED_COMPILER</DefineConstants>
     <DefineConstants>$(DefineConstants);FX_NO_CULTURE_INFO_ARGS</DefineConstants>
     <DefineConstants>$(DefineConstants);INTERNALIZED_POWER_PACK</DefineConstants>
     <DefineConstants>$(DefineConstants);COMPILER</DefineConstants>

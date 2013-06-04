@@ -32,7 +32,7 @@ open System.IO
 open System.Text
 open System.Threading
 open System.Reflection
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
 open System.Windows.Forms
 #endif
@@ -69,7 +69,7 @@ open Internal.Utilities.Collections
 open Internal.Utilities.StructuredFormat
 open Internal.Utilities.FileSystem
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 let internal exit (_ : int) = ()
 #endif
 
@@ -77,7 +77,7 @@ let internal exit (_ : int) = ()
 // Hardbinding dependencies should we NGEN fsi.exe
 //----------------------------------------------------------------------------
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
 open System.Runtime.CompilerServices
 [<Dependency("FSharp.Compiler",LoadHint.Always)>] do ()
@@ -468,7 +468,7 @@ type internal FsiCommandLineOptions(argv: string[], tcConfigB, fsiConsoleOutput:
 
     let executableFileName = 
         lazy 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
             "fsi.exe"
 #else
             let currentProcess = System.Diagnostics.Process.GetCurrentProcess()
@@ -577,7 +577,7 @@ type internal FsiCommandLineOptions(argv: string[], tcConfigB, fsiConsoleOutput:
             stopProcessingRecovery e range0; exit 1;
         inputFilesAcc
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
     do 
         if tcConfigB.utf8output then
@@ -669,7 +669,7 @@ let internal InstallErrorLoggingOnThisThread errorLogger =
 /// Set the input/output encoding. The use of a thread is due to a known bug on 
 /// on Vista where calls to Console.InputEncoding can block the process.
 let internal SetServerCodePages(fsiOptions: FsiCommandLineOptions) =     
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     ignore fsiOptions
 #else     
     match fsiOptions.FsiServerInputCodePage, fsiOptions.FsiServerOutputCodePage with 
@@ -725,7 +725,7 @@ type internal FsiConsolePrompt(fsiOptions: FsiCommandLineOptions, fsiConsoleOutp
 //----------------------------------------------------------------------------
 type internal FsiConsoleInput(fsiOptions: FsiCommandLineOptions, inReader: TextReader, outWriter: TextWriter) =
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
     let consoleLooksOperational() =
         if fsiOptions.ProbeToSeeIfConsoleWorks then 
@@ -747,7 +747,7 @@ type internal FsiConsoleInput(fsiOptions: FsiCommandLineOptions, inReader: TextR
 #endif
 
     let consoleOpt =
-#if SILVERLIGHT
+#if HOSTED_COMPILER
         None
 #else                
         // The "console.fs" code does a limited form of "TAB-completion".
@@ -769,7 +769,7 @@ type internal FsiConsoleInput(fsiOptions: FsiCommandLineOptions, inReader: TextR
 
     /// Peek on the standard input so that the user can type into it from a console window.
     do if fsiOptions.Interact then
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else       
          if fsiOptions.PeekAheadOnConsoleToPermitTyping then 
           (new Thread(fun () -> 
@@ -930,7 +930,7 @@ type internal FsiDynamicCompiler
         let mainmod3 = Morphs.morphILScopeRefsInILModuleMemoized ilGlobals (NormalizeAssemblyRefs tcImports) ilxMainModule
         errorLogger.AbortOnError();
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
 #if DEBUG
         if fsiOptions.ShowILCode then 
@@ -1423,7 +1423,7 @@ module internal MagicAssemblyResolution =
     [<CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId="System.Reflection.Assembly.UnsafeLoadFrom")>]
     let private assemblyLoadFrom (path:string) = 
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
         FileSystem.AssemblyLoadFrom(path)
 #else        
     // See bug 5501 for details on decision to use UnsafeLoadFrom here.
@@ -1518,7 +1518,7 @@ module internal MagicAssemblyResolution =
                stopProcessingRecovery e range0; 
                null
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let Install(_tcConfigB, _tcImports: TcImports, _fsiDynamicCompiler: FsiDynamicCompiler, _fsiConsoleOutput: FsiConsoleOutput) = 
         ()
         // // Look through the already loaded assemblies by hand. For some reason Assembly.Load
@@ -1598,7 +1598,7 @@ type internal FsiStdinLexerProvider(tcConfigB, fsiStdinSyphon,
     // Create a new lexer to read stdin 
     member __.CreateStdinLexer () =
         let lexbuf = 
-#if SILVERLIGHT        
+#if HOSTED_COMPILER        
             LexbufFromLineReader fsiStdinSyphon (fun () -> fsiConsoleInput.In.ReadLine() |> removeZeroCharsFromString)
 #else        
             match fsiConsoleInput.TryGetConsole() with 
@@ -1765,7 +1765,7 @@ type internal FsiInteractionProcessor
                 istate,Completed         
     #endif
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else         
             | IHash (ParsedHashDirective(("q" | "quit"),[],_),_) -> 
                 if exitViaKillThread then 
@@ -1970,7 +1970,7 @@ type internal FsiInteractionProcessor
 
 //type InteractionStateConverter = delegate of FsiDynamicCompilerState -> FsiDynamicCompilerState * stepStatus
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else            
 ///Use a dummy to access protected member
 type internal DummyForm() = 
@@ -2046,7 +2046,7 @@ let internal TrySetUnhandledExceptionMode() =
 // Server mode:
 //----------------------------------------------------------------------------
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
 let internal SpawnThread name f =
     let th = new Thread(new ThreadStart(f),Name=name)
@@ -2217,7 +2217,7 @@ let internal DriveFsiEventLoop (fsiConsoleOutput: FsiConsoleOutput) =
 /// The primary type, representing a full F# Interactive session, reading from the given
 /// text input, writing to the given text output and error writers.
 type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWriter, errorWriter: TextWriter) = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     do
         Microsoft.FSharp.Core.Printf.setWriter outWriter
         Microsoft.FSharp.Core.Printf.setError errorWriter
@@ -2225,7 +2225,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     do if not runningOnMono then Lib.UnmanagedProcessExecutionOptions.EnableHeapTerminationOnCorruption() (* SDL recommendation *)
     // See Bug 735819 
     let lcidFromCodePage = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else         
         if (Console.OutputEncoding.CodePage <> 65001) &&
            (Console.OutputEncoding.CodePage <> Thread.CurrentThread.CurrentUICulture.TextInfo.OEMCodePage) &&
@@ -2252,7 +2252,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     // tcConfig - build the initial config
     //----------------------------------------------------------------------------
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let defaultFSharpBinariesDir = "."
     let currentDirectory = "."
 #else    
@@ -2273,7 +2273,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     do SetDebugSwitch    tcConfigB (Some "pdbonly") On
     do SetTailcallSwitch tcConfigB On    
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
 #if FX_ATLEAST_40
     // set platform depending on whether the current process is a 64-bit process.
@@ -2336,7 +2336,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     let fsiConsoleInput = FsiConsoleInput(fsiOptions, inReader, outWriter)
 
     let tcGlobals,tcImports =  
-#if SILVERLIGHT
+#if HOSTED_COMPILER
       TcImports.BuildTcImports(tcConfigP) 
 #else
       try 
@@ -2356,6 +2356,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     let tcLockObject = box 7 // any new object will do
     // NOTE: this should probably be memoized in the .NET version
 
+// TODO RP not sure if SILVERLIGHT or HOSTED_COMPILER is best here
 #if SILVERLIGHT
     // Silverlight has no magic assembly resolution. So we load assemblies here if needed, and memoize the results.
     let resolveType fsiDynamicCompiler = 
@@ -2423,7 +2424,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
 
     [<CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2004:RemoveCallsToGCKeepAlive")>]
     member x.Run() = 
-#if SILVERLIGHT 
+#if HOSTED_COMPILER
       let _ = fsiInterruptController.InstallKillThread(Thread.CurrentThread, 100)
       let istate = initialInteractiveState
       fsi.EventLoop <- Microsoft.FSharp.Compiler.Interactive.RuntimeHelpers.GetSimpleEventLoop()
@@ -2517,7 +2518,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
         // to be explicitly kept alive.
         GC.KeepAlive fsiInterruptController.EventHandlers
 
-#endif // SILVERLIGHT
+#endif // HOSTED_COMPILER
 
 
 

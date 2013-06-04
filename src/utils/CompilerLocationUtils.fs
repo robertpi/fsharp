@@ -27,7 +27,7 @@ module internal FSharpEnvironment =
     // WARNING: Do not change this revision number unless you absolutely know what you're doing.
     let FSharpBinaryMetadataFormatRevision = "2.0.0.0"
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let Get32BitRegistryStringValueViaPInvoke(_subKey:string) = 
         None
     let BinFolderOfDefaultFSharpCompiler(pathProbe) = 

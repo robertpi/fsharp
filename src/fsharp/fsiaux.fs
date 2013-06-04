@@ -79,7 +79,7 @@ type InteractiveSession()  =
     let mutable showIDictionary = true
     let mutable showDeclarationValues = true
     let mutable args =
-#if SILVERLIGHT
+#if HOSTED_COMPILER
         [|"fsi.exe"|]
 #else                   
         System.Environment.GetCommandLineArgs()
@@ -145,6 +145,6 @@ module RuntimeHelpers =
     let SaveIt (x:'T) = (savedIt := (typeof<'T>, box x))
     let internal GetSavedIt () = snd !savedIt
     let internal GetSavedItType () = fst !savedIt
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let GetSimpleEventLoop() = new SimpleEventLoop() :> IEventLoop
 #endif

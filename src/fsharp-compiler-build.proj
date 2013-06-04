@@ -11,6 +11,9 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'sl5-compiler' ">
     <ProjectFiles Include="fsharp\FSharp.Compiler.Silverlight\FSharp.Compiler.Silverlight.fsproj"/>
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'mono21' ">
+    <ProjectFiles Include="fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj"/>
+  </ItemGroup>
 
   <!-- Compiler: .NET 2.0 and 4.0 only -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40'">

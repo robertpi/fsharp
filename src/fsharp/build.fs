@@ -1580,12 +1580,17 @@ let (++) x s = x @ [s]
 /// See: bug 4409.
 open Microsoft.Win32
 let highestInstalledNetFrameworkVersionMajorMinor() =
+#if HOSTED_COMPILER
 #if SILVERLIGHT
 #if FX_ATLEAST_SILVERLIGHT_50
     System.Version(4,0,5,0),"v5.0"
 #else
     System.Version(2,0,5,0),"v2.0"
 #endif
+#else
+    System.Version(2,1,5,0),"v2.1"
+#endif
+
 #else    
     try   
         let net45 = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework,Version=v4.5","",1) = box 1
@@ -1593,7 +1598,7 @@ let highestInstalledNetFrameworkVersionMajorMinor() =
         else System.Version(4,0,0,0),"v4.0" // version is 4.0 assumed since this code is running.
     with e -> 
       System.Version(4,0,0,0),"v4.0"
-#endif // SILVERLIGHT
+#endif // HOSTED_COMPILER
 
 
 //----------------------------------------------------------------------------
@@ -1837,7 +1842,7 @@ type TcConfigBuilder =
 
 
     static member CreateNew (defaultFSharpBinariesDir,optimizeForMemory,implicitIncludeDir,isInteractive,isInvalidationSupported) =
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else    
         System.Diagnostics.Debug.Assert(FileSystem.IsPathRootedShim(implicitIncludeDir), sprintf "implicitIncludeDir should be absolute: '%s'" implicitIncludeDir)
         if (String.IsNullOrEmpty(defaultFSharpBinariesDir)) then 
@@ -2433,7 +2438,7 @@ type TcConfig private (data : TcConfigBuilder,validate:bool) =
         | Some x -> 
             [tcConfig.MakePathAbsolute x]
         | None -> 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
             []
 #else                    
             // When running on Mono we lead everyone to believe we're doing .NET 4.0 compilation 
@@ -2578,7 +2583,7 @@ type TcConfig private (data : TcConfigBuilder,validate:bool) =
     // it must return warnings and errors as data
     //
     // NOTE!! if mode=ReportErrors then this method must not raise exceptions. It must just report the errors and recover
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else    
     static member TryResolveLibsUsingMSBuildRules (tcConfig:TcConfig,originalReferences:AssemblyReference list, errorAndWarningRange:range, mode:ResolveAssemblyReferenceMode) : AssemblyResolution list * UnresolvedAssemblyReference list =
         use unwindBuildPhase = PushThreadBuildPhaseUntilUnwind (BuildPhase.Parameter)
@@ -3098,7 +3103,7 @@ type TcAssemblyResolutions(results : AssemblyResolution list, unresolved : Unres
             successes, failures
 
         let resolved,unresolved = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
             fallBack() 
 #else            
             if tcConfig.useMonoResolution then 
@@ -4067,7 +4072,7 @@ type TcImports(tcConfigP:TcConfigProvider, initialResolutions:TcAssemblyResoluti
         | Some assemblyResolution -> 
             ResultD [assemblyResolution]
         | None ->
-#if SILVERLIGHT
+#if HOSTED_COMPILER
            try 
                ResultD [tcConfig.ResolveLibWithDirectories assemblyReference]
            with e -> 
@@ -5010,7 +5015,7 @@ let compilerOptionUsage (CompilerOption(s,tag,spec,_,_)) =
 let printCompilerOption (CompilerOption(_s,_tag,_spec,_,help) as compilerOption) =
     let flagWidth = 30 // fixed width for printing of flags, e.g. --warnaserror:<warn;...>
     let defaultLineWidth = 80 // the fallback width
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let lineWidth = defaultLineWidth
 #else        
     let lineWidth = try System.Console.BufferWidth with e -> defaultLineWidth

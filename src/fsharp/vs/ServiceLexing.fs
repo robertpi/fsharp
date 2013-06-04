@@ -105,7 +105,7 @@ type TokenInformation = {
 //--------------------------------------------------------------------------
 
 module internal Flags = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let init ()= ()
 #else
 #if DEBUG

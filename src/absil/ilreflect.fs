@@ -38,7 +38,7 @@ open System.Collections.Generic
 let codeLabelOrder = ComparisonIdentity.Structural<ILCodeLabel>
 
 // Convert the output of convCustomAttr
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 let wrapCustomAttr setCustomAttr (cinfo, cinfoBuilder) =
     setCustomAttr(cinfoBuilder cinfo)
 #else
@@ -632,7 +632,7 @@ let convFieldInit x =
     | ILFieldInit.Double ieee64 -> box ieee64 
     | ILFieldInit.Null            -> (null :> Object)
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 //----------------------------------------------------------------------------
 // convAttribElem
 //----------------------------------------------------------------------------
@@ -1366,7 +1366,7 @@ let convCustomAttr cenv emEnv cattr =
        | res -> res
 // In Silverlight, we cannot use the byte[] data to generate attributes (security restriction).
 // Instead, we return a function which creates a CustomAttributeBuilder to be used for SetCustomAttributes.
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     let ty : System.Type = convType cenv emEnv cattr.Method.EnclosingType
     let convAttrArray arr = [|for i in arr -> convAttribElem cenv emEnv i|]
 

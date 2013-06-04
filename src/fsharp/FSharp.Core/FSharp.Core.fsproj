@@ -24,7 +24,7 @@
     <OutputType>Library</OutputType>
     <AssemblyName>FSharp.Core</AssemblyName>
     <DefineConstants>RUNTIME;$(DefineConstants)</DefineConstants>
-    <DefineConstants Condition=" '$(TargetFramework)'=='sl5-compiler'">EXTRAS_FOR_SILVERLIGHT_COMPILER;$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFramework)'=='sl5-compiler' OR '$(TargetFramework)'=='mono21'">EXTRAS_FOR_SILVERLIGHT_COMPILER;$(DefineConstants)</DefineConstants>
     <OtherFlags Condition=" '$(TargetFramework)'=='sl5-compiler'">$(OtherFlags) --nodebugdata</OtherFlags>
     <NoWarn>44;45;55;62;75;1204</NoWarn>
     <BaseAddress>0x05000000</BaseAddress>

@@ -904,7 +904,7 @@ type ILAttribElem =
 type ILAttributeNamedArg =  (string * ILType * bool * ILAttribElem)
 type ILAttribute = 
     { Method: ILMethodSpec;
-#if SILVERLIGHT
+#if HOSTED_COMPILER
       Arguments: ILAttribElem list * ILAttributeNamedArg list
 #endif
       Data: byte[] }
@@ -4328,7 +4328,7 @@ let mkILCustomAttribMethRef (ilg: ILGlobals) (mspec:ILMethodSpec, fixedArgs: lis
              yield! encodeCustomAttrNamedArg ilg namedArg |]
 
     { Method = mspec;
-#if SILVERLIGHT
+#if HOSTED_COMPILER
       Arguments = fixedArgs, namedArgs
 #endif
       Data = args }

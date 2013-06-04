@@ -987,7 +987,7 @@ module MainModuleBuilder =
                  let name,bytes,pub = 
                      let lower = String.lowercase file
                      if List.exists (Filename.checkSuffix lower) [".resx"]  then
-#if SILVERLIGHT
+#if HOSTED_COMPILER
                          failwith "resx files not supported as legacy compiler inputs"
 #else
                          let file = tcConfig.ResolveSourceFile(rangeStartup,file,tcConfig.implicitIncludeDir)
@@ -1269,7 +1269,7 @@ module StaticLinker =
 
     #if DEBUG
     let PrintModule outfile x = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
         ()
 #else
         use os = File.CreateText(outfile) :> TextWriter
@@ -1741,7 +1741,7 @@ let main1(argv,bannerAlreadyPrinted,exiter:Exiter,createErrorLogger) =
 
     // See Bug 735819 
     let lcidFromCodePage = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
         None
 #else
         if (System.Console.OutputEncoding.CodePage <> 65001) &&
@@ -1754,13 +1754,13 @@ let main1(argv,bannerAlreadyPrinted,exiter:Exiter,createErrorLogger) =
 #endif
 
     let tcGlobals,tcImports,frameworkTcImports,generatedCcu,typedAssembly,topAttrs,tcConfig,outfile,pdbfile,assemblyName,errorLogger = 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
         let curDir = "."
 #else
         let curDir = Directory.GetCurrentDirectory()
 #endif
         getTcImportsFromCommandLine(None, argv, defaultFSharpBinariesDir, curDir, lcidFromCodePage, (fun tcConfigB ->
-#if SILVERLIGHT
+#if HOSTED_COMPILER
                           ()
 #else
                           match tcConfigB.lcid with

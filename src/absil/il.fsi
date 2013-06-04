@@ -1030,7 +1030,7 @@ type ILAttributeNamedArg = string * ILType * bool * ILAttribElem
 /// to ILAttribElem's as best as possible.  
 type ILAttribute =
     { Method: ILMethodSpec;  
-#if SILVERLIGHT
+#if HOSTED_COMPILER
       Arguments: ILAttribElem list * ILAttributeNamedArg list
 #endif
       Data: byte[] }

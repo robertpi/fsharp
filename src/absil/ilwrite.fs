@@ -15,7 +15,7 @@ module internal Microsoft.FSharp.Compiler.AbstractIL.ILBinaryWriter
 
 open Internal.Utilities
 open Microsoft.FSharp.Compiler.AbstractIL 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
 open Microsoft.FSharp.Compiler.AbstractIL.ILAsciiWriter 
 #endif

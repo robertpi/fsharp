@@ -2650,7 +2650,7 @@ and seekReadCustomAttr ctxt (TaggedIndex(cat,idx),b) =
 and seekReadCustomAttrUncached ctxtH (CustomAttrIdx (cat,idx,valIdx)) = 
     let ctxt = getHole ctxtH
     { Method=seekReadCustomAttrType ctxt (TaggedIndex(cat,idx));
-#if SILVERLIGHT
+#if HOSTED_COMPILER
       Arguments = [], []
 #endif
       Data=
