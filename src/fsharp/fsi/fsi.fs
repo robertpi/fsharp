@@ -2217,7 +2217,7 @@ let internal DriveFsiEventLoop (fsiConsoleOutput: FsiConsoleOutput) =
 /// The primary type, representing a full F# Interactive session, reading from the given
 /// text input, writing to the given text output and error writers.
 type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWriter, errorWriter: TextWriter) = 
-#if HOSTED_COMPILER
+#if SILVERLIGHT
     do
         Microsoft.FSharp.Core.Printf.setWriter outWriter
         Microsoft.FSharp.Core.Printf.setError errorWriter

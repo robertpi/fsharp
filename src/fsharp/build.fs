@@ -3130,7 +3130,7 @@ type TcAssemblyResolutions(results : AssemblyResolution list, unresolved : Unres
                       yield AssemblyReference(rangeStartup,s+".dll") 
 
           if tcConfig.useFsiAuxLib then 
-#if SILVERLIGHT          
+#if HOSTED_COMPILER          
               let name = GetFsiLibraryName()+".dll" 
 #else
               let name = Path.Combine(tcConfig.fsharpBinariesDir, GetFsiLibraryName()+".dll")
