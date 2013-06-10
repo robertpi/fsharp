@@ -391,6 +391,11 @@ type internal ErrorLoggerThatStopsOnFirstError(tcConfigB:TcConfigBuilder, fsiStd
     member x.ErrorSinkHelper(err) = 
         fsiStdinSyphon.PrintError(tcConfigB,false,err)
         errors <- errors + 1
+#if ANDROID
+        Android.Util.Log.Info("FSI", sprintf "ErrorSinkHelper err.Exception: %O" err.Exception)
+        Android.Util.Log.Info("FSI", sprintf "ErrorSinkHelper err.Exception.StackTrace %s" err.Exception.StackTrace)
+#endif
+
         if tcConfigB.abortOnError then exit 1 (* non-zero exit code *)
         // STOP ON FIRST ERROR (AVOIDS PARSER ERROR RECOVERY)
         raise StopProcessing 

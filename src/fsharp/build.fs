@@ -3095,8 +3095,9 @@ type TcAssemblyResolutions(results : AssemblyResolution list, unresolved : Unres
                 |> List.map (fun assemblyReference -> 
                        try 
                            Choice1Of2 (tcConfig.ResolveLibWithDirectories assemblyReference)
-                       with e -> 
-                           errorRecovery e assemblyReference.Range
+                       with e ->
+                           // TODO undstand why assemblies aren't found and why error recovery doesn't work 
+                           //errorRecovery e assemblyReference.Range
                            Choice2Of2 assemblyReference)
             let successes = resolutions |> List.choose (function Choice1Of2 x -> Some x | _ -> None)
             let failures = resolutions |> List.choose (function Choice2Of2 x -> Some (UnresolvedAssemblyReference(x.Text,[x])) | _ -> None)

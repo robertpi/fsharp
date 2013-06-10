@@ -331,7 +331,7 @@ module ErrorLoggerExtensions =
             | _ ->
                 try  
                     x.ErrorR (AttachRange m exn) // may raise exceptions, e.g. an fsi error sink raises StopProcessing.
-#if SILVERLIGHT
+#if HOSTED_COMPILER
 #else
                     ReraiseIfWatsonable(exn)
 #endif

@@ -1436,17 +1436,20 @@ module Shim =
 #endif
 
 
-#if SILVERLIGHT
+#if HOSTED_COMPILER
     open System.IO.IsolatedStorage
     open System.Windows
     open System
+#if ANDROID
+    let mutable AssetManager: Android.Content.Res.AssetManager = null
+    let DllAssets = [ "FSharp.Core.dll"; "Mono.Android.dll";
+                      "mscorlib.dll"; "System.dll";
+                      "System.Core.dll" ]
+    let IsResourceDll path = DllAssets |> Seq.exists (fun path' -> path' = path)
+#endif
 
     let mutable FileSystem = 
         { new FileSystem() with 
-            member __.FileStreamReadShim (fileName:string) = 
-                match Application.GetResourceStream(System.Uri(fileName,System.UriKind.Relative)) with 
-                | null -> IsolatedStorageFile.GetUserStoreForApplication().OpenFile(fileName, System.IO.FileMode.Open) :> System.IO.Stream 
-                | resStream -> resStream.Stream
 
             member __.FileStreamCreateShim (fileName:string) = 
                 System.IO.IsolatedStorage.IsolatedStorageFile.GetUserStoreForApplication().CreateFile(fileName) :> Stream
@@ -1458,6 +1461,12 @@ module Shim =
                 String.IsNullOrEmpty(filename) || filename.IndexOfAny(System.IO.Path.GetInvalidPathChars()) <> -1
 
             member __.GetTempPathShim() = "." 
+
+#if SILVERLIGHT
+            member __.FileStreamReadShim (fileName:string) = 
+                match Application.GetResourceStream(System.Uri(fileName,System.UriKind.Relative)) with 
+                | null -> IsolatedStorageFile.GetUserStoreForApplication().OpenFile(fileName, System.IO.FileMode.Open) :> System.IO.Stream 
+                | resStream -> resStream.Stream
 
             member __.GetLastWriteTimeShim (fileName:string) = 
                 match Application.GetResourceStream(System.Uri(fileName,System.UriKind.Relative)) with 
@@ -1471,7 +1480,29 @@ module Shim =
                 match Application.GetResourceStream(System.Uri(fileName,System.UriKind.Relative)) with 
                 | null -> IsolatedStorageFile.GetUserStoreForApplication().DeleteFile fileName
                 | _resStream -> ()
-            
+#endif
+#if ANDROID
+            member __.FileStreamReadShim (fileName:string) = 
+                Android.Util.Log.Info("FSI", sprintf "FileStreamReadShim %s" fileName)
+                if IsResourceDll fileName then AssetManager.Open(fileName)
+                else IsolatedStorageFile.GetUserStoreForApplication().OpenFile(fileName, System.IO.FileMode.Open) :> System.IO.Stream 
+
+            member __.GetLastWriteTimeShim (fileName:string) = 
+                Android.Util.Log.Info("FSI", sprintf "GetLastWriteTimeShim %s" fileName)
+                if IsResourceDll fileName then System.DateTime.Today.Date
+                else IsolatedStorageFile.GetUserStoreForApplication().GetLastAccessTime(fileName).LocalDateTime 
+                
+
+            member __.SafeExists (fileName:string) = 
+                Android.Util.Log.Info("FSI", sprintf "SafeExists %s" fileName)
+                if IsResourceDll fileName then true
+                else IsolatedStorageFile.GetUserStoreForApplication().FileExists fileName
+                
+            member __.FileDelete (fileName:string) = 
+                Android.Util.Log.Info("FSI", sprintf "FileDelete %s" fileName)
+                if IsResourceDll fileName then ()
+                else IsolatedStorageFile.GetUserStoreForApplication().DeleteFile fileName
+ #endif
           }
 #else
 
