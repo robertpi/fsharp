@@ -1444,7 +1444,8 @@ module Shim =
     let mutable AssetManager: Android.Content.Res.AssetManager = null
     let DllAssets = [ "FSharp.Core.dll"; "Mono.Android.dll";
                       "mscorlib.dll"; "System.dll";
-                      "System.Core.dll" ]
+                      "System.Core.dll"; "FSharp.Core.sigdata";
+                      "FSharp.Core.optdata" ]
     let IsResourceDll path = DllAssets |> Seq.exists (fun path' -> path' = path)
 #endif
 
@@ -1484,7 +1485,13 @@ module Shim =
 #if ANDROID
             member __.FileStreamReadShim (fileName:string) = 
                 Android.Util.Log.Info("FSI", sprintf "FileStreamReadShim %s" fileName)
-                if IsResourceDll fileName then AssetManager.Open(fileName)
+                if IsResourceDll fileName then 
+                    let file = AssetManager.Open(fileName)
+                    Android.Util.Log.Info("FSI", sprintf "FileStreamReadShim - file.CanSeek %b" file.CanSeek) |> ignore
+                    let memStream = new System.IO.MemoryStream()
+                    file.CopyTo(memStream)
+                    memStream.Position <- 0L
+                    memStream :> System.IO.Stream
                 else IsolatedStorageFile.GetUserStoreForApplication().OpenFile(fileName, System.IO.FileMode.Open) :> System.IO.Stream 
 
             member __.GetLastWriteTimeShim (fileName:string) = 

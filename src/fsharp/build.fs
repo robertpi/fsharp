@@ -3097,6 +3097,9 @@ type TcAssemblyResolutions(results : AssemblyResolution list, unresolved : Unres
                            Choice1Of2 (tcConfig.ResolveLibWithDirectories assemblyReference)
                        with e ->
                            // TODO undstand why assemblies aren't found and why error recovery doesn't work 
+#if ANDROID
+                           do Android.Util.Log.Info("FSI", sprintf "Resolve fallBack() %O" e) |> ignore
+#endif
                            //errorRecovery e assemblyReference.Range
                            Choice2Of2 assemblyReference)
             let successes = resolutions |> List.choose (function Choice1Of2 x -> Some x | _ -> None)

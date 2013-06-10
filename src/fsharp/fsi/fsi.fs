@@ -2340,6 +2340,10 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
 
     let fsiConsoleInput = FsiConsoleInput(fsiOptions, inReader, outWriter)
 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "FsiConsoleInput - Done!") |> ignore
+#endif
+
     let tcGlobals,tcImports =  
 #if HOSTED_COMPILER
       TcImports.BuildTcImports(tcConfigP) 
@@ -2350,12 +2354,22 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
           stopProcessingRecovery e range0; exit 1
 #endif
 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "TcImports.BuildTcImports - Done!") |> ignore
+#endif
+
     let ilGlobals  = tcGlobals.ilg
 
     let niceNameGen = NiceNameGenerator() 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "NiceNameGenerator()  - Done!") |> ignore
+#endif
 
     // Share intern'd strings across all lexing/parsing
     let lexResourceManager = new Lexhelp.LexResourceManager() 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "Lexhelp.LexResourceManager - Done!") |> ignore
+#endif
 
     /// The lock stops the type checker running at the same time as the server intellisense implementation.
     let tcLockObject = box 7 // any new object will do
@@ -2399,22 +2413,52 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
         | None -> None
           
 #endif
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "tcImports.TryFindExistingFullyQualifiedPathFromAssemblyRef - Done!") |> ignore
+#endif
        
     let rec fsiDynamicCompiler = FsiDynamicCompiler(timeReporter, tcConfigB, tcLockObject, errorLogger, outWriter, tcImports, tcGlobals, ilGlobals, fsiOptions, fsiConsoleOutput, niceNameGen, resolveType (fun () -> fsiDynamicCompiler) ) 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "FsiDynamicCompiler - Done!") |> ignore
+#endif
     
     let fsiInterruptController = FsiInterruptController(fsiOptions, fsiConsoleOutput) 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "FsiInterruptController - Done!") |> ignore
+#endif
     
     do MagicAssemblyResolution.Install(tcConfigB, tcImports, fsiDynamicCompiler, fsiConsoleOutput)
+
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "MagicAssemblyResolution.Install - Done!") |> ignore
+#endif
     
     /// This reference cell holds the most recent interactive state 
     let initialInteractiveState = fsiDynamicCompiler.GetInitialInteractiveState ()
     let istateRef = ref initialInteractiveState
+
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "fsiDynamicCompiler.GetInitialInteractiveState - Done!") |> ignore
+#endif
       
     let fsiStdinLexerProvider = FsiStdinLexerProvider(tcConfigB, fsiStdinSyphon, fsiConsoleInput, fsiConsoleOutput, fsiOptions, lexResourceManager, errorLogger)
 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "FsiStdinLexerProvider - Done!") |> ignore
+#endif
+
     let fsiIntellisenseProvider = FsiIntellisenseProvider(tcGlobals, tcImports)
 
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "FsiIntellisenseProvider - Done!") |> ignore
+#endif
+
     let fsiInteractionProcessor = FsiInteractionProcessor(tcConfigB, errorLogger, fsiOptions, fsiDynamicCompiler, fsiConsolePrompt, fsiConsoleOutput, fsiInterruptController, fsiStdinLexerProvider, lexResourceManager) 
+
+#if ANDROID
+    do Android.Util.Log.Info("FSI", sprintf "FsiInteractionProcessor - Done!") |> ignore
+    do Android.Util.Log.Info("FSI", sprintf "Done! Done! Done!") |> ignore
+#endif
 
     /// Load the dummy interaction, load the initial files, and,
     /// if interacting, start the background thread to read the standard input.
