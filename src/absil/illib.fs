@@ -1443,9 +1443,11 @@ module Shim =
 #if ANDROID
     let mutable AssetManager: Android.Content.Res.AssetManager = null
     let DllAssets = [ "FSharp.Core.dll"; "Mono.Android.dll";
-                      "mscorlib.dll"; "System.dll";
+                      "mscorlib.dll"; "System.dll"; 
+                      "System.Xml.dll";
                       "System.Core.dll"; "FSharp.Core.sigdata";
-                      "FSharp.Core.optdata" ]
+                      "FSharp.Core.optdata";
+                      "FSharp.Compiler.Mono.Android.dll"; ]
     let IsResourceDll path = DllAssets |> Seq.exists (fun path' -> path' = path)
 #endif
 

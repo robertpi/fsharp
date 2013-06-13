@@ -1470,8 +1470,12 @@ let OutputErrorOrWarningContext prefix fileLineFn os err =
 //----------------------------------------------------------------------------
 
 let GetFSharpCoreLibraryName () = "FSharp.Core"
+#if HOSTED_COMPILER
 #if SILVERLIGHT
 let GetFsiLibraryName () = "FSharp.Compiler.Silverlight"  
+#else
+let GetFsiLibraryName () = "FSharp.Compiler.Mono.Android"  
+#endif
 #else
 let GetFsiLibraryName () = "FSharp.Compiler.Interactive.Settings"  
 #endif
@@ -1485,11 +1489,15 @@ let GetFsiLibraryName () = "FSharp.Compiler.Interactive.Settings"
 //            -- for files given on a command line without --noframework set
 let DefaultBasicReferencesForOutOfProjectSources = 
     [ 
-#if SILVERLIGHT    
+#if HOSTED_COMPILER    
       yield "System.dll"
       yield "System.Xml.dll" 
       yield "System.Core.dll"
+#if SILVERLIGHT
       yield "System.Net.dll"]
+#else      
+       ]
+#endif
 #else      
       yield "System"
       yield "System.Xml" 
@@ -4227,6 +4235,10 @@ type TcImports(tcConfigP:TcConfigProvider, initialResolutions:TcAssemblyResoluti
     member tcImports.ReportUnresolvedAssemblyReferences(knownUnresolved) =
         // Report that an assembly was not resolved.
         let reportAssemblyNotResolved(file,originalReferences:AssemblyReference list) = 
+#if ANDROID
+            do Android.Util.Log.Info("FSI", sprintf "reportAssemblyNotResolved %s %A" file originalReferences) |> ignore
+#endif
+
             originalReferences |> List.iter(fun originalReference -> errorR(AssemblyNotResolved(file,originalReference.Range)))
         knownUnresolved
         |> List.map (function UnresolvedAssemblyReference(file,originalReferences) -> file,originalReferences)
