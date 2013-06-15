@@ -935,7 +935,7 @@ type internal FsiDynamicCompiler
         let mainmod3 = Morphs.morphILScopeRefsInILModuleMemoized ilGlobals (NormalizeAssemblyRefs tcImports) ilxMainModule
         errorLogger.AbortOnError();
 
-#if HOSTED_COMPILER
+#if SILVERLIGHT
 #else
 #if DEBUG
         if fsiOptions.ShowILCode then 
@@ -944,6 +944,11 @@ type internal FsiDynamicCompiler
             fsiConsoleOutput.uprintnfn "--------------------"
 #endif
 #endif
+        // TODO RP always print the il, 
+        fsiConsoleOutput.uprintnfn "--------------------";
+        ILAsciiWriter.output_module outWriter mainmod3;
+        fsiConsoleOutput.uprintnfn "--------------------"
+
         ignore fsiOptions
 
         ReportTime tcConfig "Reflection.Emit";
@@ -989,6 +994,9 @@ type internal FsiDynamicCompiler
 
             let (TAssembly(declaredImpls)) = declaredImpls
             for (TImplFile(_qname,_,mexpr,_,_)) in declaredImpls do
+#if ANDROID
+                Android.Util.Log.Info("FSI", sprintf "Process Inputs %A %A" _qname mexpr) |> ignore
+#endif
                 let responseL = NicePrint.layoutInferredSigOfModuleExpr false denv infoReader AccessibleFromSomewhere rangeStdin mexpr 
                 if not (Layout.isEmptyL responseL) then      
                     fsiConsoleOutput.uprintfn "";
@@ -1888,10 +1896,17 @@ type internal FsiInteractionProcessor
             fsiConsolePrompt.Print();
             istate |> InteractiveCatch (fun istate -> 
                 if !progress then fprintfn fsiConsoleOutput.Out "entering ParseInteraction...";
+#if ANDROID
+                do Android.Util.Log.Info("FSI", sprintf "entering ParseInteraction...  %b" !progress) |> ignore
+#endif
 
                 // Parse the interaction. When FSI.EXE is waiting for input from the console the 
                 // parser thread is blocked somewhere deep this call. 
                 let action  = ParseInteraction tokenizer
+
+#if ANDROID
+                do Android.Util.Log.Info("FSI", sprintf "returned from ParseInteraction...calling runCodeOnMainThread...  %b" !progress) |> ignore
+#endif
 
                 if !progress then fprintfn fsiConsoleOutput.Out "returned from ParseInteraction...calling runCodeOnMainThread...";
 
@@ -1900,6 +1915,9 @@ type internal FsiInteractionProcessor
                 let res = istate  |> runCodeOnMainThread (fun istate -> MainThreadProcessParsedInteraction (exitViaKillThread, action, istate)) 
 
                 if !progress then fprintfn fsiConsoleOutput.Out "Just called runCodeOnMainThread, res = %O..." res;
+#if ANDROID
+                do Android.Util.Log.Info("FSI", sprintf "Just called runCodeOnMainThread, res = %O..." res) |> ignore
+#endif
                 res)
         
     /// Perform an "include" on a script file (i.e. a script file specified on the command line)
@@ -2117,6 +2135,7 @@ let internal StartStdinReadAndProcessThread
 
     let stdinReaderThread = 
         new Thread(new ThreadStart(fun () ->
+
             InstallErrorLoggingOnThisThread errorLogger // FSI error logging on stdinReaderThread, e.g. parse errors.
             SetCurrentUICultureForThread lcid
             try
@@ -2149,9 +2168,16 @@ let internal StartStdinReadAndProcessThread
                                   f istate) // FSI error logging on switched to thread
                           with _ -> 
                               (istate,Completed)
+#if ANDROID
+                      do Android.Util.Log.Info("FSI", sprintf "StartStdinReadAndProcessThread - before ParseAndProcessAndEvalOneInteractionFromLexbuf") |> ignore
+#endif
                               
                       let istateNew,contNew = 
                           fsiInteractionProcessor.ParseAndProcessAndEvalOneInteractionFromLexbuf (exitViaKillThread, runCodeOnMainThread, !istateRef, !tokenizerRef)   
+
+#if ANDROID
+                      do Android.Util.Log.Info("FSI", sprintf "StartStdinReadAndProcessThread - after ParseAndProcessAndEvalOneInteractionFromLexbuf") |> ignore
+#endif
 
                       istateRef := istateNew; 
                       cont := contNew;
@@ -2340,10 +2366,6 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
 
     let fsiConsoleInput = FsiConsoleInput(fsiOptions, inReader, outWriter)
 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "FsiConsoleInput - Done!") |> ignore
-#endif
-
     let tcGlobals,tcImports =  
 #if HOSTED_COMPILER
       TcImports.BuildTcImports(tcConfigP) 
@@ -2361,15 +2383,9 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     let ilGlobals  = tcGlobals.ilg
 
     let niceNameGen = NiceNameGenerator() 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "NiceNameGenerator()  - Done!") |> ignore
-#endif
 
     // Share intern'd strings across all lexing/parsing
     let lexResourceManager = new Lexhelp.LexResourceManager() 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "Lexhelp.LexResourceManager - Done!") |> ignore
-#endif
 
     /// The lock stops the type checker running at the same time as the server intellisense implementation.
     let tcLockObject = box 7 // any new object will do
@@ -2412,53 +2428,23 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
         | Some resolvedPath -> Some (Choice1Of2 resolvedPath)
         | None -> None
           
-#endif
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "tcImports.TryFindExistingFullyQualifiedPathFromAssemblyRef - Done!") |> ignore
-#endif
-       
+#endif       
+
     let rec fsiDynamicCompiler = FsiDynamicCompiler(timeReporter, tcConfigB, tcLockObject, errorLogger, outWriter, tcImports, tcGlobals, ilGlobals, fsiOptions, fsiConsoleOutput, niceNameGen, resolveType (fun () -> fsiDynamicCompiler) ) 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "FsiDynamicCompiler - Done!") |> ignore
-#endif
     
     let fsiInterruptController = FsiInterruptController(fsiOptions, fsiConsoleOutput) 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "FsiInterruptController - Done!") |> ignore
-#endif
     
     do MagicAssemblyResolution.Install(tcConfigB, tcImports, fsiDynamicCompiler, fsiConsoleOutput)
-
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "MagicAssemblyResolution.Install - Done!") |> ignore
-#endif
     
     /// This reference cell holds the most recent interactive state 
     let initialInteractiveState = fsiDynamicCompiler.GetInitialInteractiveState ()
     let istateRef = ref initialInteractiveState
 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "fsiDynamicCompiler.GetInitialInteractiveState - Done!") |> ignore
-#endif
-      
     let fsiStdinLexerProvider = FsiStdinLexerProvider(tcConfigB, fsiStdinSyphon, fsiConsoleInput, fsiConsoleOutput, fsiOptions, lexResourceManager, errorLogger)
-
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "FsiStdinLexerProvider - Done!") |> ignore
-#endif
 
     let fsiIntellisenseProvider = FsiIntellisenseProvider(tcGlobals, tcImports)
 
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "FsiIntellisenseProvider - Done!") |> ignore
-#endif
-
     let fsiInteractionProcessor = FsiInteractionProcessor(tcConfigB, errorLogger, fsiOptions, fsiDynamicCompiler, fsiConsolePrompt, fsiConsoleOutput, fsiInterruptController, fsiStdinLexerProvider, lexResourceManager) 
-
-#if ANDROID
-    do Android.Util.Log.Info("FSI", sprintf "FsiInteractionProcessor - Done!") |> ignore
-    do Android.Util.Log.Info("FSI", sprintf "Done! Done! Done!") |> ignore
-#endif
 
     /// Load the dummy interaction, load the initial files, and,
     /// if interacting, start the background thread to read the standard input.
@@ -2474,11 +2460,14 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
     [<CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2004:RemoveCallsToGCKeepAlive")>]
     member x.Run() = 
 #if HOSTED_COMPILER
+      // TODO RP remove when done, will out put some debug stuff hopefully
+      progress := true
       let _ = fsiInterruptController.InstallKillThread(Thread.CurrentThread, 100)
       let istate = initialInteractiveState
       fsi.EventLoop <- Microsoft.FSharp.Compiler.Interactive.RuntimeHelpers.GetSimpleEventLoop()
       let istate = fsiInteractionProcessor.LoadInitialFiles(false, istate)
       istateRef := istate
+
       StartStdinReadAndProcessThread(fsiOptions.FsiLCID, istateRef, errorLogger, fsiConsoleInput, fsiConsoleOutput, fsiStdinLexerProvider, fsiInteractionProcessor, true)
 
       DriveFsiEventLoop fsiConsoleOutput 
@@ -2611,6 +2600,10 @@ type CompilerInputStream() =
     override x.Write(_buffer, _offset, _count) = raise (NotSupportedException("Cannot write to input stream")) 
     override x.Read(buffer, offset, count) = 
         let bytes = waitForAtLeastOneByte count
+#if ANDROID
+        let stack = new System.Diagnostics.StackTrace()
+        Android.Util.Log.Info("FSI", sprintf "CompilerInputStream - Read bytes.Length: %i stack: %O" bytes.Length stack) |> ignore
+#endif
         Array.Copy(bytes, 0, buffer, offset, bytes.Length)
         bytes.Length
 
@@ -2645,6 +2638,9 @@ type CompilerOutputStream()  =
     override x.Write(buffer, offset, count) = 
         let stop = offset + count
         if (stop > buffer.Length) then raise (ArgumentException("offset,count"))
+#if ANDROID
+        Android.Util.Log.Info("FSI", sprintf "CompilerOutputStream - Write buffer.Length: %i" buffer.Length) |> ignore
+#endif
 
         lock contentQueue (fun () -> 
             for i in offset .. stop - 1 do

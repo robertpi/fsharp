@@ -24,6 +24,7 @@
     <DefineConstants>$(DefineConstants);INCLUDE_METADATA_READER</DefineConstants>
     <DefineConstants>$(DefineConstants);INCLUDE_METADATA_WRITER</DefineConstants>
     <DefineConstants>$(DefineConstants);EXTENSIBLE_DUMPER</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
     <NoWarn>$(NoWarn);44;62;9;1203</NoWarn>
     <ProjectGuid>{a90a57be-c2bd-4cb9-87dc-c0d18820ff6b}</ProjectGuid>
     <AllowCrossTargeting>true</AllowCrossTargeting>
@@ -148,6 +149,18 @@
     </Compile>
     <Compile Include="..\..\absil\ilx.fs">
       <Link>ilx.fs</Link>
+    </Compile>
+    <Compile Include="..\..\absil\ilascii.fsi">
+      <Link>ilascii.fsi</Link>
+    </Compile>
+    <Compile Include="..\..\absil\ilascii.fs">
+      <Link>ilascii.fs</Link>
+    </Compile>
+    <Compile Include="..\..\absil\ilprint.fsi">
+      <Link>ilprint.fsi</Link>
+    </Compile>
+    <Compile Include="..\..\absil\ilprint.fs">
+      <Link>ilprint.fs</Link>
     </Compile>
     <Compile Include="..\..\absil\ilmorph.fsi">
       <Link>ilmorph.fsi</Link>
