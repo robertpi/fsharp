@@ -944,11 +944,6 @@ type internal FsiDynamicCompiler
             fsiConsoleOutput.uprintnfn "--------------------"
 #endif
 #endif
-        // TODO RP always print the il, 
-        fsiConsoleOutput.uprintnfn "--------------------";
-        ILAsciiWriter.output_module outWriter mainmod3;
-        fsiConsoleOutput.uprintnfn "--------------------"
-
         ignore fsiOptions
 
         ReportTime tcConfig "Reflection.Emit";
@@ -994,9 +989,6 @@ type internal FsiDynamicCompiler
 
             let (TAssembly(declaredImpls)) = declaredImpls
             for (TImplFile(_qname,_,mexpr,_,_)) in declaredImpls do
-#if ANDROID
-                Android.Util.Log.Info("FSI", sprintf "Process Inputs %A %A" _qname mexpr) |> ignore
-#endif
                 let responseL = NicePrint.layoutInferredSigOfModuleExpr false denv infoReader AccessibleFromSomewhere rangeStdin mexpr 
                 if not (Layout.isEmptyL responseL) then      
                     fsiConsoleOutput.uprintfn "";

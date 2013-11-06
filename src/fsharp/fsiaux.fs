@@ -46,7 +46,13 @@ type internal SimpleEventLoop() =
              let rec run() = 
                  match waitSignal2 runSignal exitSignal with 
                  | 0 -> 
+#if ANDROID
+                     do Android.Util.Log.Info("FSI", sprintf "Simple event loop Run - before doing work") |> ignore
+#endif
                      !queue |> List.iter (fun f -> result := try Some(f()) with _ -> None); 
+#if ANDROID
+                     do Android.Util.Log.Info("FSI", sprintf "Simple event loop Run - after doing work") |> ignore
+#endif
                      setSignal doneSignal;
                      run()
                  | 1 -> 
@@ -56,8 +62,14 @@ type internal SimpleEventLoop() =
              run();
          member x.Invoke(f : unit -> 'T) : 'T  = 
              queue := [f >> box];
+#if ANDROID
+             do Android.Util.Log.Info("FSI", sprintf "Simple event loop Invoke - before setSignal runSignal") |> ignore
+#endif
              setSignal runSignal;
              waitSignal doneSignal
+#if ANDROID
+             do Android.Util.Log.Info("FSI", sprintf "Simple event loop Invoke - after waitSignal doneSignal") |> ignore
+#endif
              !result |> Option.get |> unbox
          member x.ScheduleRestart() = 
              // nb. very minor race condition here on running here, but totally 

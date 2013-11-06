@@ -1,0 +1,101 @@
+Microsoft (R) Build Engine version 4.0.30319.17929
+[Microsoft .NET Framework, version 4.0.30319.18033]
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Build started 04/06/2013 10:19:25.
+Project "C:\code\fsharp\src\fsharp-compiler-build.proj" on node 1 (default targets).
+Project "C:\code\fsharp\src\fsharp-compiler-build.proj" (1) is building "C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj" (2) on node 1 (Build target(s)).
+CallFsSrGen:
+Skipping target "CallFsSrGen" because all output files are up-to-date with respect to the input files.
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.targets(983,5): warning MSB3644: The reference assemblies for framework ".NETFramework,Version=v2.1" were not found. To resolve this, install the SDK or Targeting Pack for this framework version or retarget your application to a version of the framework for which you have the SDK or Targeting Pack installed. Note that assemblies will be resolved from the Global Assembly Cache (GAC) and will be used in place of reference assemblies. Therefore your assembly may not be correctly targeted for the framework you intend. [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+Project "C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj" (2) is building "C:\code\fsharp\src\fsharp\FSharp.Core\FSharp.Core.fsproj" (3) on node 1 (default targets).
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.targets(983,5): warning MSB3644: The reference assemblies for framework ".NETFramework,Version=v2.1" were not found. To resolve this, install the SDK or Targeting Pack for this framework version or retarget your application to a version of the framework for which you have the SDK or Targeting Pack installed. Note that assemblies will be resolved from the Global Assembly Cache (GAC) and will be used in place of reference assemblies. Therefore your assembly may not be correctly targeted for the framework you intend. [C:\code\fsharp\src\fsharp\FSharp.Core\FSharp.Core.fsproj]
+CoreResGen:
+  No resources are out of date with respect to their source files. Skipping resource generation.
+CoreCompile:
+Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+CopyFilesToOutputDirectory:
+  FSharp.Core -> C:\code\fsharp\lib\release\2.1\FSharp.Core.dll
+Done Building Project "C:\code\fsharp\src\fsharp\FSharp.Core\FSharp.Core.fsproj" (default targets).
+CoreResGen:
+  "C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\bin\NETFX 4.0 Tools\resgen.exe" /useSourcePath /r:C:\code\fsharp\lib\release\2.1\FSharp.Core.dll /r:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\dependencies\mono\2.1\mscorlib.dll /r:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\dependencies\mono\2.1\System.Core.dll /r:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\dependencies\mono\2.1\System.dll /compile FSComp.resx,obj\release\2.1\FSComp.resources FSIstrings.resx,obj\release\2.1\FSIstrings.resources ..\FSStrings.resx,obj\release\2.1\FSStrings.resources
+  Processing resource file "FSComp.resx" into "obj\release\2.1\FSComp.resources".
+  Processing resource file "FSIstrings.resx" into "obj\release\2.1\FSIstrings.resources".
+  Processing resource file "..\FSStrings.resx" into "obj\release\2.1\FSStrings.resources".
+CallFsLex:
+Skipping target "CallFsLex" because all output files are up-to-date with respect to the input files.
+CallFsYacc:
+Skipping target "CallFsYacc" because all output files are up-to-date with respect to the input files.
+CoreCompile:
+  C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\lib\proto\4.0\fsc-proto.exe -o:obj\release\2.1\FSharp.Compiler.Mono.Android.dll -g --debug:pdbonly --noframework --baseaddress:0x06800000 --define:CROSS_PLATFORM_COMPILER --define:STRONG_NAME_FSHARP_COMPILER_WITH_TEST_KEY --define:HOSTED_COMPILER --define:FX_NO_CULTURE_INFO_ARGS --define:INTERNALIZED_POWER_PACK --define:COMPILER --define:NO_PDB_READER --define:NO_PDB_WRITER --define:NO_INLINE_IL_PARSER --define:INCLUDE_METADATA_READER --define:INCLUDE_METADATA_WRITER --define:EXTENSIBLE_DUMPER --define:FX_NO_STRUCTURAL_EQUALITY --define:FX_NO_CUSTOMATTRIBUTEDATA --define:FX_NO_BIGINT_CULTURE_PARSE --define:FX_ATLEAST_40 --define:FX_ATLEAST_35 --define:FX_ATLEAST_LINQ --define:FX_NO_BIGINT --doc:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\lib\release\2.1\FSharp.Compiler.Mono.Android.xml --optimize+ --resource:obj\release\2.1\FSComp.resources --resource:obj\release\2.1\FSIstrings.resources --resource:obj\release\2.1\FSStrings.resources --versionfile:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\source-build-version -r:C:\code\fsharp\lib\release\2.1\FSharp.Core.dll -r:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\dependencies\mono\2.1\mscorlib.dll -r:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\dependencies\mono\2.1\System.Core.dll -r:C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\dependencies\mono\2.1\System.dll --target:library --nowarn:44,62,9,1203,69,65,54,61,75 --warn:3 --warnaserror:76 --fullpaths --flaterrors --highentropyva-  /warnon:1182 --nodebugdata --times --keyfile:"C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\fsharp\test.snk" obj\release\2.1\FSComp.fs obj\release\2.1\FSIstrings.fs ..\..\assemblyinfo\assemblyinfo.FSharp.Compiler.Mono.Android.dll.fs ..\ExtensibleDumper.fsi ..\ExtensibleDumper.fs ..\..\utils\sformat.fsi ..\..\utils\sformat.fs ..\sr.fsi ..\sr.fs ..\..\utils\prim-lexing.fsi ..\..\utils\prim-lexing.fs ..\..\utils\prim-parsing.fsi ..\..\utils\prim-parsing.fs ..\..\utils\resizearray.fsi ..\..\utils\resizearray.fs ..\..\utils\HashMultiMap.fsi ..\..\utils\HashMultiMap.fs ..\..\utils\TaggedCollections.fsi ..\..\utils\TaggedCollections.fs ..\FlatList.fs ..\..\absil\illib.fs ..\..\utils\filename.fsi ..\..\utils\filename.fs ..\..\absil\zmap.fsi ..\..\absil\zmap.fs ..\..\absil\zset.fsi ..\..\absil\zset.fs ..\..\absil\bytes.fsi ..\..\absil\bytes.fs ..\..\absil\ildiag.fsi ..\..\absil\ildiag.fs ..\ReferenceResolution.fs ..\..\absil\il.fsi ..\..\absil\il.fs ..\..\absil\ilx.fsi ..\..\absil\ilx.fs ..\..\absil\ilmorph.fsi ..\..\absil\ilmorph.fs ..\..\absil\ilsupp.fsi ..\..\absil\ilsupp.fs ..\..\absil\ilbinary.fs ..\lib.fs ..\range.fsi ..\range.fs ..\ErrorLogger.fs ..\tainted.fsi ..\tainted.fs ..\InternalCollections.fsi ..\InternalCollections.fs ..\..\absil\ilread.fsi ..\..\absil\ilread.fs ..\..\absil\ilwrite.fsi ..\..\absil\ilwrite.fs ..\..\absil\ilreflect.fs ..\..\utils\CompilerLocationUtils.fs ..\PrettyNaming.fs ..\..\ilx\ilxsettings.fs ..\..\ilx\pubclo.fsi ..\..\ilx\pubclo.fs ..\..\ilx\cu_erase.fsi ..\..\ilx\cu_erase.fs ..\InternalFileSystemUtils.fsi ..\InternalFileSystemUtils.fs ..\unilex.fsi ..\unilex.fs ..\layout.fsi ..\layout.fs ..\ast.fs ..\est.fsi ..\est.fs pars.fs ..\lexhelp.fsi ..\lexhelp.fs lex.fs ..\sreflect.fsi ..\sreflect.fs ..\QueueList.fs ..\tast.fs ..\env.fs ..\tastops.fsi ..\tastops.fs ..\pickle.fsi ..\pickle.fs ..\lexfilter.fs ..\import.fsi ..\import.fs ..\infos.fs ..\NicePrint.fs ..\augment.fsi ..\augment.fs ..\outcome.fsi ..\outcome.fs ..\nameres.fsi ..\nameres.fs ..\typrelns.fs ..\patcompile.fsi ..\patcompile.fs ..\csolve.fsi ..\csolve.fs ..\formats.fsi ..\formats.fs ..\unsolved.fs ..\creflect.fsi ..\creflect.fs ..\check.fsi ..\check.fs ..\tc.fsi ..\tc.fs ..\opt.fsi ..\opt.fs ..\detuple.fsi ..\detuple.fs ..\tlr.fsi ..\tlr.fs ..\lowertop.fs ..\ilxgen.fsi ..\ilxgen.fs ..\TraceCall.fsi ..\TraceCall.fs ..\build.fsi ..\build.fs ..\fscopts.fsi ..\fscopts.fs ..\fsiaux.fsi ..\fsiaux.fs ..\vs\IncrementalBuild.fsi ..\vs\IncrementalBuild.fs ..\fsc.fs ..\vs\Reactor.fsi ..\vs\Reactor.fs ..\vs\ServiceLexing.fsi ..\vs\ServiceLexing.fs ..\vs\ServiceConstants.fs ..\vs\ServiceParseTreeWalk.fs ..\vs\ServiceNavigation.fsi ..\vs\ServiceNavigation.fs ..\vs\ServiceParamInfoLocations.fsi ..\vs\ServiceParamInfoLocations.fs ..\vs\ServiceUntypedParse.fsi ..\vs\ServiceUntypedParse.fs ..\vs\ServiceDeclarations.fsi ..\vs\ServiceDeclarations.fs ..\vs\service.fsi ..\vs\service.fs ..\fsi\fsi.fs ..\vs\SimpleServices.fs 
+  
+C:\code\fsharp\src\utils\CompilerLocationUtils.fs(33,42): warning FS1182: The value 'pathProbe' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\tast.fs(481,29): warning FS1182: The value 'withStaticParameters' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\csolve.fs(1276,40): warning FS1182: The value 'css' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\build.fs(3789,53): warning FS1182: The value 'tpApprovalsRef' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\build.fs(3789,79): warning FS1182: The value 'displayPSTypeProviderSecurityDialogBlockingUI' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\build.fs(3823,57): warning FS1182: The value 'tpApprovalsRef' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\build.fs(3823,83): warning FS1182: The value 'displayPSTypeProviderSecurityDialogBlockingUI' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\build.fs(4068,86): warning FS1182: The value 'mode' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\fsc.fs(1762,106): warning FS1182: The value 'tcConfigB' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\vs\service.fs(1985,17): warning FS1182: The value 'incrementalBuilder' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\fsi\fsi.fs(1548,37): warning FS1182: The value 'fsiOptions' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\fsi\fsi.fs(2405,9): warning FS1182: The value 'istateRef' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\fsi\fsi.fs(2409,9): warning FS1182: The value 'fsiIntellisenseProvider' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  
+C:\code\fsharp\src\fsharp\fsi\fsi.fs(2411,9): warning FS1182: The value 'fsiInteractionProcessor' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+CopyFilesToOutputDirectory:
+  Copying file from "obj\release\2.1\FSharp.Compiler.Mono.Android.dll" to "C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\lib\release\2.1\FSharp.Compiler.Mono.Android.dll".
+  FSharp.Compiler.Mono.Android -> C:\code\fsharp\lib\release\2.1\FSharp.Compiler.Mono.Android.dll
+  Copying file from "obj\release\2.1\FSharp.Compiler.Mono.Android.pdb" to "C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\..\..\..\lib\release\2.1\FSharp.Compiler.Mono.Android.pdb".
+Done Building Project "C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj" (Build target(s)).
+Done Building Project "C:\code\fsharp\src\fsharp-compiler-build.proj" (default targets).
+
+Build succeeded.
+
+"C:\code\fsharp\src\fsharp-compiler-build.proj" (default target) (1) ->
+"C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj" (Build target) (2) ->
+(GetReferenceAssemblyPaths target) -> 
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.targets(983,5): warning MSB3644: The reference assemblies for framework ".NETFramework,Version=v2.1" were not found. To resolve this, install the SDK or Targeting Pack for this framework version or retarget your application to a version of the framework for which you have the SDK or Targeting Pack installed. Note that assemblies will be resolved from the Global Assembly Cache (GAC) and will be used in place of reference assemblies. Therefore your assembly may not be correctly targeted for the framework you intend. [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+
+
+"C:\code\fsharp\src\fsharp-compiler-build.proj" (default target) (1) ->
+"C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj" (Build target) (2) ->
+"C:\code\fsharp\src\fsharp\FSharp.Core\FSharp.Core.fsproj" (default target) (3) ->
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Microsoft.Common.targets(983,5): warning MSB3644: The reference assemblies for framework ".NETFramework,Version=v2.1" were not found. To resolve this, install the SDK or Targeting Pack for this framework version or retarget your application to a version of the framework for which you have the SDK or Targeting Pack installed. Note that assemblies will be resolved from the Global Assembly Cache (GAC) and will be used in place of reference assemblies. Therefore your assembly may not be correctly targeted for the framework you intend. [C:\code\fsharp\src\fsharp\FSharp.Core\FSharp.Core.fsproj]
+
+
+"C:\code\fsharp\src\fsharp-compiler-build.proj" (default target) (1) ->
+"C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj" (Build target) (2) ->
+(CoreCompile target) -> 
+  C:\code\fsharp\src\utils\CompilerLocationUtils.fs(33,42): warning FS1182: The value 'pathProbe' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\tast.fs(481,29): warning FS1182: The value 'withStaticParameters' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\csolve.fs(1276,40): warning FS1182: The value 'css' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\build.fs(3789,53): warning FS1182: The value 'tpApprovalsRef' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\build.fs(3789,79): warning FS1182: The value 'displayPSTypeProviderSecurityDialogBlockingUI' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\build.fs(3823,57): warning FS1182: The value 'tpApprovalsRef' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\build.fs(3823,83): warning FS1182: The value 'displayPSTypeProviderSecurityDialogBlockingUI' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\build.fs(4068,86): warning FS1182: The value 'mode' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\fsc.fs(1762,106): warning FS1182: The value 'tcConfigB' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\vs\service.fs(1985,17): warning FS1182: The value 'incrementalBuilder' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\fsi\fsi.fs(1548,37): warning FS1182: The value 'fsiOptions' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\fsi\fsi.fs(2405,9): warning FS1182: The value 'istateRef' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\fsi\fsi.fs(2409,9): warning FS1182: The value 'fsiIntellisenseProvider' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+  C:\code\fsharp\src\fsharp\fsi\fsi.fs(2411,9): warning FS1182: The value 'fsiInteractionProcessor' is unused [C:\code\fsharp\src\fsharp\FSharp.Compiler.Mono.Android\FSharp.Compiler.Mono.Android.fsproj]
+
+    16 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:01:16.35
