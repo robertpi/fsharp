@@ -28,7 +28,7 @@ type IEventLoop =
     
 // An implementation of IEventLoop suitable for the command-line console
 [<AutoSerializable(false)>]
-type internal SimpleEventLoop() = 
+type SimpleEventLoop() = 
     let runSignal = new AutoResetEvent(false)
     let exitSignal = new AutoResetEvent(false)
     let doneSignal = new AutoResetEvent(false)
@@ -152,5 +152,8 @@ module RuntimeHelpers =
     let internal GetSavedIt () = snd !savedIt
     let internal GetSavedItType () = fst !savedIt
 #if SILVERLIGHT
+    let GetSimpleEventLoop() = new SimpleEventLoop() :> IEventLoop
+#endif
+#if EXTERNAL_EVENT_LOOP
     let GetSimpleEventLoop() = new SimpleEventLoop() :> IEventLoop
 #endif

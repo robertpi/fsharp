@@ -507,6 +507,9 @@
     <Compile Include="..\fsi\fsi.fs">
       <Link>fsi.fs</Link>
     </Compile>
+    <Compile Include="fsihost.fs">
+      <Link>fsihost.fs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

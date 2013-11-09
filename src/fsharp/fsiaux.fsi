@@ -71,3 +71,6 @@ module RuntimeHelpers =
 #if SILVERLIGHT
     val GetSimpleEventLoop : unit -> IEventLoop
 #endif
+#if EXTERNAL_EVENT_LOOP
+    val GetSimpleEventLoop : unit -> IEventLoop
+#endif
