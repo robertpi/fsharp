@@ -75,7 +75,10 @@ type internal SimpleEventLoop() =
 
 [<Sealed>]
 type InteractiveSession()  = 
+#if EXTERNAL_EVENT_LOOP
+#else
     let mutable evLoop = (new SimpleEventLoop() :> IEventLoop)
+#endif
     let mutable showIDictionary = true
     let mutable showDeclarationValues = true
     let mutable args =
@@ -114,9 +117,12 @@ type InteractiveSession()  =
     member self.AddPrinter(printer : 'T -> string) =
       addedPrinters <- Choice1Of2 (typeof<'T>, (fun (x:obj) -> printer (unbox x))) :: addedPrinters
 
+#if EXTERNAL_EVENT_LOOP
+#else
     member self.EventLoop
        with get () = evLoop
        and set (x:IEventLoop)  = evLoop.ScheduleRestart(); evLoop <- x
+#endif
 
     member self.AddPrintTransformer(printer : 'T -> obj) =
       addedPrinters <- Choice2Of2 (typeof<'T>, (fun (x:obj) -> printer (unbox x))) :: addedPrinters

@@ -2104,7 +2104,11 @@ let internal StartStdinReadAndProcessThread
                                    fsiConsoleOutput: FsiConsoleOutput,
                                    fsiStdinLexerProvider: FsiStdinLexerProvider, 
                                    fsiInteractionProcessor : FsiInteractionProcessor,
-                                   exitViaKillThread) = 
+                                   exitViaKillThread
+#if EXTERNAL_EVENT_LOOP
+                                   , eventLoop: IEventLoop
+#endif
+                                   ) = 
     if !progress then fprintfn fsiConsoleOutput.Out "creating stdinReaderThread";
     let cont = ref Completed 
     let tokenizerRef = ref (fsiStdinLexerProvider.CreateStdinLexer())
@@ -2138,7 +2142,11 @@ let internal StartStdinReadAndProcessThread
 
                       let runCodeOnMainThread f istate = 
                           try 
+#if EXTERNAL_EVENT_LOOP
+                              eventLoop.Invoke (fun () -> 
+#else
                               fsi.EventLoop.Invoke (fun () -> 
+#endif    
                                   InstallErrorLoggingOnThisThread errorLogger; 
                                   SetCurrentUICultureForThread lcid;
                                   f istate) // FSI error logging on switched to thread
@@ -2184,15 +2192,22 @@ let internal StartStdinReadAndProcessThread
     if !progress then fprintfn fsiConsoleOutput.Out "MAIN: starting stdin thread...";
     stdinReaderThread.Start();
 
-
+#if EXTERNAL_EVENT_LOOP
+let internal DriveFsiEventLoop (fsiConsoleOutput: FsiConsoleOutput) (eventLoop: IEventLoop) = 
+#else
 let internal DriveFsiEventLoop (fsiConsoleOutput: FsiConsoleOutput) = 
+#endif
     let rec runLoop() = 
         if !progress then fprintfn fsiConsoleOutput.Out "GUI thread runLoop";
         let restart = 
             try 
               // BLOCKING POINT: The GUI Thread spends most (all) of its time this event loop
               if !progress then fprintfn fsiConsoleOutput.Out "MAIN:  entering event loop...";
+#if EXTERNAL_EVENT_LOOP
+              eventLoop.Run()
+#else
               fsi.EventLoop.Run()
+#endif
             with
             |  :? ThreadAbortException ->
               // If this TAE handler kicks it's almost certainly too late to save the
@@ -2216,7 +2231,11 @@ let internal DriveFsiEventLoop (fsiConsoleOutput: FsiConsoleOutput) =
 
 /// The primary type, representing a full F# Interactive session, reading from the given
 /// text input, writing to the given text output and error writers.
+#if EXTERNAL_EVENT_LOOP
+type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWriter, errorWriter: TextWriter, eventLoop: IEventLoop) = 
+#else
 type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWriter, errorWriter: TextWriter) = 
+#endif
 #if SILVERLIGHT
     do
         Microsoft.FSharp.Core.Printf.setWriter outWriter
@@ -2449,7 +2468,11 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
         use unwindBuildPhase = PushThreadBuildPhaseUntilUnwind (BuildPhase.Interactive)
 
         let threadException exn = 
+#if EXTERNAL_EVENT_LOOP
+             eventLoop.Invoke (
+#else
              fsi.EventLoop.Invoke (
+#endif
                 fun () ->          
                     fprintfn fsiConsoleOutput.Error "%s" (exn.ToString())
                     errorLogger.SetError()
@@ -2493,20 +2516,31 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
                         ();
 
                 // This is the event loop for winforms
+#if EXTERNAL_EVENT_LOOP
+#else
                 try fsi.EventLoop <- WinFormsEventLoop(fsiConsoleOutput, fsiOptions.FsiLCID)
                 with e ->
                     printfn "Your system doesn't seem to support WinForms correctly. You will"
                     printfn "need to set fsi.EventLoop use GUI windows from F# Interactive."
                     printfn "You can set different event loops for MonoMac, Gtk#, WinForms and other"
                     printfn "UI toolkits. Drop the --gui argument if no event loop is required."
-                    
+#endif                    
                                        
             istateRef := fsiInteractionProcessor.LoadInitialFiles (exitViaKillThread, !istateRef)
 
-            StartStdinReadAndProcessThread(fsiOptions.FsiLCID, istateRef, errorLogger, fsiConsoleInput, fsiConsoleOutput, fsiStdinLexerProvider, fsiInteractionProcessor, exitViaKillThread)            
+            StartStdinReadAndProcessThread(fsiOptions.FsiLCID, istateRef, errorLogger, 
+                                           fsiConsoleInput, fsiConsoleOutput, fsiStdinLexerProvider, 
+                                           fsiInteractionProcessor, exitViaKillThread
+#if EXTERNAL_EVENT_LOOP
+                                           , eventLoop
+#endif
+                                           )            
 
+#if EXTERNAL_EVENT_LOOP
+            DriveFsiEventLoop fsiConsoleOutput eventLoop
+#else
             DriveFsiEventLoop fsiConsoleOutput 
-
+#endif
         else // not interact
             if !progress then fprintfn fsiConsoleOutput.Out "Run: not interact, loading intitial files..."
             istateRef := fsiInteractionProcessor.LoadInitialFiles (false, !istateRef)

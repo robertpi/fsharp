@@ -13,7 +13,7 @@
     <Platform>AnyCPU</Platform>
     <OutputType>Library</OutputType>
     <AssemblyName>FSharp.Compiler.Hosted</AssemblyName>
-    <DefineConstants>EXTENSIONTYPING;COMPILER;INCLUDE_METADATA_READER;INCLUDE_METADATA_WRITER;EXTENSIBLE_DUMPER;TYPE_PROVIDER_SECURITY;$(DefineConstants)</DefineConstants>
+    <DefineConstants>EXTENSIONTYPING;COMPILER;INCLUDE_METADATA_READER;INCLUDE_METADATA_WRITER;EXTENSIBLE_DUMPER;TYPE_PROVIDER_SECURITY;EXTERNAL_EVENT_LOOP;$(DefineConstants)</DefineConstants>
     <NoWarn>$(NoWarn);44;62;9;1203</NoWarn>
     <ProjectGuid>{a90a57be-c2bd-4cb9-87dc-c0d18820ff6b}</ProjectGuid>
     <AllowCrossTargeting>true</AllowCrossTargeting>

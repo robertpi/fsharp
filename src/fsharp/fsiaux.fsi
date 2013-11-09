@@ -49,10 +49,11 @@ type InteractiveSession =
     /// 'test2.fs', 'hello', 'goodbye'.  This value will normally be different to those
     /// returned by System.Environment.GetCommandLineArgs.</summary>
     member CommandLineArgs : string [] with get,set
-    
+#if EXTERNAL_EVENT_LOOP
+#else
     /// <summary>Gets or sets a the current event loop being used to process interactions.</summary>
     member EventLoop: IEventLoop with get,set
-    
+#endif    
     
 
 module Settings = 
