@@ -19,6 +19,7 @@ src/fsharp/FSharp.Compiler-proto/*.resources
 src/fsharp/FSharp.Compiler-proto/*.sln
 src/fsharp/FSharp.Compiler-proto/*.userprefs
 src/fsharp/fsi/*.resx
+src/fsharp/fsiAnyCpu/*.resx
 src/fsharp/FSharp.Compiler.Interactive.Settings/*.resx
 src/fsharp/FSharp.Compiler.Server.Shared/*.resx
 src/fsharp/fsi/Fsi.sln
@@ -27,6 +28,11 @@ src/fsharp/FSharp.Compiler/*.resx
 src/fsharp/FSharp.Compiler/*.resources
 src/fsharp/FSharp.Compiler/*.sln
 src/fsharp/FSharp.Compiler/*.userprefs
+src/fsharp/FSharp.Compiler.Hosted/*.resx
+src/fsharp/FSharp.Compiler.Hosted/*lex.fs
+src/fsharp/FSharp.Compiler.Hosted/*pars.fs*
+src/fsharp/FSharp.Compiler.Silverlight/*pars.fs*
+src/fsharp/FSharp.Compiler.Silverlight/*lex.fs
 Debug
 Proto
 .libs
