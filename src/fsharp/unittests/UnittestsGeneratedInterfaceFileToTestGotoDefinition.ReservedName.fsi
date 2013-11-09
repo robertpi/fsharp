@@ -70,7 +70,11 @@ namespace Internal.Utilities
     val tryRegKey : subKey:string -> string option
     val tryCurrentDomain : unit -> string option
     val tryAppConfig : appConfigKey:string -> string option
-    val BinFolderOfDefaultFSharpCompiler : string option
+    val tryFsharpiScript : url:string -> string option
+    val BackupInstallationProbePoints : string list
+    val safeExists : f:string -> bool
+    val BinFolderOfDefaultFSharpCompiler :
+      probePoint:string option -> string option
     val IsRunningOnNetFx45OrAbove : bool
   end
 

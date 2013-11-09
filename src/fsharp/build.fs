@@ -1567,8 +1567,11 @@ let BasicReferencesForScriptLoadClosure =
     [ GetFsiLibraryName()+".dll"  ]
 #else
     ["mscorlib"; GetFSharpCoreLibraryName () ] @ // Need to resolve these explicitly so they will be found in the reference assemblies directory which is where the .xml files are.
-    DefaultBasicReferencesForOutOfProjectSources @ 
-    [ GetFsiLibraryName() ]
+    DefaultBasicReferencesForOutOfProjectSources 
+#if EXTERNAL_EVENT_LOOP
+#else
+    @ [ GetFsiLibraryName() ]
+#endif
 #endif
 
 let (++) x s = x @ [s]

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <FSharpSourcesRoot>$(MSBuildProjectDirectory)\..\..</FSharpSourcesRoot>
@@ -15,7 +15,7 @@
     <AssemblyName>FSharp.Compiler.Hosted</AssemblyName>
     <DefineConstants>EXTENSIONTYPING;COMPILER;INCLUDE_METADATA_READER;INCLUDE_METADATA_WRITER;EXTENSIBLE_DUMPER;TYPE_PROVIDER_SECURITY;EXTERNAL_EVENT_LOOP;$(DefineConstants)</DefineConstants>
     <NoWarn>$(NoWarn);44;62;9;1203</NoWarn>
-    <ProjectGuid>{a90a57be-c2bd-4cb9-87dc-c0d18820ff6b}</ProjectGuid>
+    <ProjectGuid>{1ebf5f15-aee0-4844-9cf8-49e5e1b22694}</ProjectGuid>
     <AllowCrossTargeting>true</AllowCrossTargeting>
     <BaseAddress>0x06800000</BaseAddress>
     <OtherFlags>$(OtherFlags) /warnon:1182 --nodebugdata</OtherFlags>

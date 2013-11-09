@@ -984,6 +984,7 @@ type internal FsiDynamicCompiler
 
             let (TAssembly(declaredImpls)) = declaredImpls
             for (TImplFile(_qname,_,mexpr,_,_)) in declaredImpls do
+                // TODO RP raise event with value thingy here..
                 let responseL = NicePrint.layoutInferredSigOfModuleExpr false denv infoReader AccessibleFromSomewhere rangeStdin mexpr 
                 if not (Layout.isEmptyL responseL) then      
                     fsiConsoleOutput.uprintfn "";
@@ -2285,7 +2286,10 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
                                                     isInvalidationSupported=false)
     let tcConfigP = TcConfigProvider.BasedOnMutableBuilder(tcConfigB)
     do tcConfigB.resolutionEnvironment <- MSBuildResolver.RuntimeLike // See Bug 3608
+#if EXTERNAL_EVENT_LOOP
+#else
     do tcConfigB.useFsiAuxLib <- true
+#endif
 
     // Preset: --optimize+ -g --tailcalls+ (see 4505)
     do SetOptimizeSwitch tcConfigB On
@@ -2559,6 +2563,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
 [<AllowNullLiteral>]
 type CompilerInputStream() = 
     inherit Stream()
+    let isDisposed = ref false
     // Duration (in milliseconds) of the pause in the loop of waitForAtLeastOneByte. 
     let pauseDuration = 100
 
@@ -2567,6 +2572,7 @@ type CompilerInputStream() =
 
     let  waitForAtLeastOneByte(count : int) =
         let rec loop() = 
+            if !isDisposed then raise (new EndOfStreamException())
             let attempt = 
                 lock readQueue (fun () ->
                     let n = readQueue.Count
@@ -2597,6 +2603,8 @@ type CompilerInputStream() =
         let bytes = waitForAtLeastOneByte count
         Array.Copy(bytes, 0, buffer, offset, bytes.Length)
         bytes.Length
+    override x.Dispose(disposing: bool) =
+        isDisposed := true
 
     /// Feeds content into the stream.
     member x.Add(str:string) =
@@ -2616,6 +2624,7 @@ type CompilerOutputStream()  =
     // Queue of characters waiting to be read.
     let contentQueue = new Queue<byte>()
     let nyi() = raise (NotSupportedException())
+    let isDisposed = ref false
 
     override x.CanRead = false
     override x.CanWrite = true
@@ -2633,9 +2642,12 @@ type CompilerOutputStream()  =
         lock contentQueue (fun () -> 
             for i in offset .. stop - 1 do
                 contentQueue.Enqueue(buffer.[i]))
+    override x.Dispose(disposing: bool) =
+        isDisposed := true
 
     member x.Read() = 
         lock contentQueue (fun () -> 
+            if !isDisposed then raise (new EndOfStreamException())
             let n = contentQueue.Count
             if (n > 0) then 
                 let bytes = Array.zeroCreate n

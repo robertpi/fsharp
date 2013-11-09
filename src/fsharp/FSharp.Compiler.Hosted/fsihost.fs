@@ -27,16 +27,34 @@ type FsiHosted() as self =
 
     do Async.Start runAsync
 
+    let readFromOuput = ref true
+
     let readLoop =    
-        async { while true do
-                    do output'.Flush()
-                    do output.Flush()
-                    let readText = output.Read()
+        async { while !readFromOuput do
+                    // at some point we will get a steam disposed exception
+                    let readText = 
+                        try
+                            output'.Flush()
+                            output.Flush()
+                            output.Read()
+                        with
+                        // TODO where to write this exception to?
+                        | _ -> ""
                     if not (String.IsNullOrWhiteSpace readText) then
                         resultsEvent.Trigger(self, new FsiResultEventArgs(readText))
                     do! Async.Sleep 100 }
                              
     do readLoop |> Async.Start
+
+    let dispose() =
+        readFromOuput := false
+        interact.Interrupt()
+        let disposer =  eventLoop :?> IDisposable
+        disposer.Dispose()
+        input.Dispose()
+        output.Dispose()
+        input'.Dispose()
+        output'.Dispose()
 
     [<CLIEvent>]
     member self.Results = resultsEvent.Publish
@@ -48,8 +66,6 @@ type FsiHosted() as self =
     member self.Interrupt() = interact.Interrupt()
 
     interface IDisposable with 
-         member self.Dispose() =
-            interact.Interrupt()
-            let disposer =  eventLoop :?> IDisposable
-            disposer.Dispose()
+         member self.Dispose() = dispose()
 
+    member self.Dispose() = dispose()
