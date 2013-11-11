@@ -822,7 +822,7 @@ let internal WithImplicitHome (tcConfigB, dir) f =
     try f() 
     finally tcConfigB.implicitIncludeDir <- old
 
-
+let compilerTable = new Dictionary<System.Guid, obj -> unit>()
 
 /// Encapsulates the coordination of the typechecking, optimization and code generation
 /// components of the F# compiler for interactively executed fragments of code.
@@ -842,8 +842,15 @@ type internal FsiDynamicCompiler
                         niceNameGen,
                         resolvePath) = 
 
+
     let outfile = "TMPFSCI.exe"
     let assemblyName = "FSI-ASSEMBLY"
+
+    let compilationResultsEvent = new Event<TypedAssembly*DisplayEnv>()
+    let gotItEvent = new Event<obj>()
+    let id = Guid.NewGuid()
+
+    do compilerTable.Add(id, gotItEvent.Trigger)
 
     let mutable fragmentId = 0
     let mutable prevIt : ValRef option = None
@@ -966,6 +973,8 @@ type internal FsiDynamicCompiler
 
         errorLogger.AbortOnError();
 
+        compilationResultsEvent.Trigger (declaredImpls, tcState.TcEnvFromImpls.DisplayEnv)
+
         // Echo the decls (reach inside wrapping)
         // This code occurs AFTER the execution of the declarations.
         // So stored values will have been initialised, modified etc.
@@ -984,7 +993,6 @@ type internal FsiDynamicCompiler
 
             let (TAssembly(declaredImpls)) = declaredImpls
             for (TImplFile(_qname,_,mexpr,_,_)) in declaredImpls do
-                // TODO RP raise event with value thingy here..
                 let responseL = NicePrint.layoutInferredSigOfModuleExpr false denv infoReader AccessibleFromSomewhere rangeStdin mexpr 
                 if not (Layout.isEmptyL responseL) then      
                     fsiConsoleOutput.uprintfn "";
@@ -1060,7 +1068,7 @@ type internal FsiDynamicCompiler
         istate
 
     // Construct the code that saves the 'it' value into the 'SaveIt' register.
-    member __.BuildItBinding (expr: SynExpr) =
+    member fsiDynamicCompiler.BuildItBinding (expr: SynExpr) =
         let m = expr.Range
         let itName = "it" 
 
@@ -1070,7 +1078,12 @@ type internal FsiDynamicCompiler
         let bindingA = mkBind (mkSynPatVar None itID) expr (* let it = <expr> *)  // NOTE: the generalizability of 'expr' must not be damaged, e.g. this can't be an application 
         let saverPath  = ["Microsoft";"FSharp";"Compiler";"Interactive";"RuntimeHelpers";"SaveIt"]
         let dots = List.replicate (saverPath.Length - 1) rangeStdin
-        let bindingB = mkBind (SynPat.Wild m) (SynExpr.App(ExprAtomicFlag.NonAtomic, false, SynExpr.LongIdent(false, LongIdentWithDots(List.map (mkSynId rangeStdin) saverPath,dots),None,m), itExp,m)) (* let _  = saverPath it *)
+        let guidPath  = ["System";"Guid";]
+        let guidDots = List.replicate (saverPath.Length - 1) rangeStdin
+        let firstSaveBind = (SynExpr.App(ExprAtomicFlag.NonAtomic, false, SynExpr.LongIdent(false, LongIdentWithDots(List.map (mkSynId rangeStdin) saverPath,dots),None,m), itExp,m))
+        let newGuid = SynExpr.New(false, SynType.LongIdent(LongIdentWithDots(List.map (mkSynId rangeStdin) guidPath,guidDots)), SynExpr.Const(SynConst.String(id.ToString(), m), m), m)
+        let secondSaveBind = SynExpr.App(ExprAtomicFlag.NonAtomic, false, firstSaveBind, newGuid, m)
+        let bindingB = mkBind (SynPat.Wild m)  secondSaveBind (* let _  = saverPath it *)
         let defA = SynModuleDecl.Let (false, [bindingA], m)
         let defB = SynModuleDecl.Let (false, [bindingB], m)
         
@@ -1163,8 +1176,19 @@ type internal FsiDynamicCompiler
          tcState   = tcState;
          ilxGenerator = ilxGenerator;
          timing    = false;
-        } 
+        }
 
+    member x.CompilationResults = compilationResultsEvent.Publish 
+    member x.GotIt = gotItEvent.Publish
+
+    member x.Dispose() =
+        compilerTable.Remove id |> ignore
+
+    interface System.IDisposable with 
+         member x.Dispose() =
+            compilerTable.Remove id |> ignore
+
+RuntimeHelpers.InvokeGotIt <- (fun id obj -> compilerTable.[id] obj)
 
 type internal FsiIntellisenseProvider(tcGlobals, tcImports: TcImports) = 
 
@@ -2286,10 +2310,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
                                                     isInvalidationSupported=false)
     let tcConfigP = TcConfigProvider.BasedOnMutableBuilder(tcConfigB)
     do tcConfigB.resolutionEnvironment <- MSBuildResolver.RuntimeLike // See Bug 3608
-#if EXTERNAL_EVENT_LOOP
-#else
     do tcConfigB.useFsiAuxLib <- true
-#endif
 
     // Preset: --optimize+ -g --tailcalls+ (see 4505)
     do SetOptimizeSwitch tcConfigB On
@@ -2417,7 +2438,7 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
           
 #endif
        
-    let rec fsiDynamicCompiler = FsiDynamicCompiler(timeReporter, tcConfigB, tcLockObject, errorLogger, outWriter, tcImports, tcGlobals, ilGlobals, fsiOptions, fsiConsoleOutput, niceNameGen, resolveType (fun () -> fsiDynamicCompiler) ) 
+    let rec fsiDynamicCompiler = new FsiDynamicCompiler(timeReporter, tcConfigB, tcLockObject, errorLogger, outWriter, tcImports, tcGlobals, ilGlobals, fsiOptions, fsiConsoleOutput, niceNameGen, resolveType (fun () -> fsiDynamicCompiler) ) 
     
     let fsiInterruptController = FsiInterruptController(fsiOptions, fsiConsoleOutput) 
     
@@ -2557,6 +2578,14 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
 
 #endif // SILVERLIGHT
 
+    member internal x.CompilationResults = fsiDynamicCompiler.CompilationResults
+    member internal x.GotIt = fsiDynamicCompiler.GotIt
+    
+    member x.Dispose() = fsiDynamicCompiler.Dispose()
+
+    interface System.IDisposable with 
+         member x.Dispose() =
+            fsiDynamicCompiler.Dispose()
 
 
 /// Defines a read-only input stream used to feed content to the hosted F# Interactive dynamic compiler.

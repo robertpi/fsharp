@@ -14,6 +14,7 @@
 namespace Microsoft.FSharp.Compiler.Interactive
 
 open System
+open System.Collections.Generic
 open System.Diagnostics
 open System.Threading
 
@@ -148,13 +149,11 @@ module RuntimeHelpers =
     open System
     open System.Reflection
 
+    let mutable internal InvokeGotIt = (fun (_: Guid) (_: obj) -> ())
     let internal savedIt = ref (typeof<int>,box 0)
-    let SaveIt (x:'T) = (savedIt := (typeof<'T>, box x))
+    let SaveIt (x:'T) (id: Guid) = 
+        InvokeGotIt id (box x)
+        (savedIt := (typeof<'T>, box x))
     let internal GetSavedIt () = snd !savedIt
     let internal GetSavedItType () = fst !savedIt
-#if SILVERLIGHT
     let GetSimpleEventLoop() = new SimpleEventLoop() :> IEventLoop
-#endif
-#if EXTERNAL_EVENT_LOOP
-    let GetSimpleEventLoop() = new SimpleEventLoop() :> IEventLoop
-#endif

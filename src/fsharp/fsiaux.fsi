@@ -63,14 +63,10 @@ module Settings =
 
 /// <summary>Hooks (internal use only, may change without notice).</summary>
 module RuntimeHelpers = 
-    val SaveIt : 'T -> unit
+    val mutable internal InvokeGotIt : (System.Guid -> obj -> unit)
+    val SaveIt : 'T -> System.Guid -> unit
     val internal GetSavedIt : unit -> obj
     val internal GetSavedItType : unit -> System.Type
 (*    val openPaths : unit -> string[] *)
 
-#if SILVERLIGHT
     val GetSimpleEventLoop : unit -> IEventLoop
-#endif
-#if EXTERNAL_EVENT_LOOP
-    val GetSimpleEventLoop : unit -> IEventLoop
-#endif
