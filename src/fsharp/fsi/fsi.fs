@@ -391,7 +391,12 @@ type internal ErrorLoggerThatStopsOnFirstError(tcConfigB:TcConfigBuilder, fsiStd
     member x.ErrorSinkHelper(err) = 
         fsiStdinSyphon.PrintError(tcConfigB,false,err)
         errors <- errors + 1
-        if tcConfigB.abortOnError then exit 1 (* non-zero exit code *)
+        if tcConfigB.abortOnError then 
+#if HOSTED_COMPILER
+            failwithf "%A" err
+#else
+            exit 1 (* non-zero exit code *)
+#endif
         // STOP ON FIRST ERROR (AVOIDS PARSER ERROR RECOVERY)
         raise StopProcessing 
     
@@ -574,7 +579,12 @@ type internal FsiCommandLineOptions(argv: string[], tcConfigB, fsiConsoleOutput:
            let abbrevArgs = abbrevFlagSet tcConfigB false
            ParseCompilerOptions collect fsiCompilerOptions (List.tail (PostProcessCompilerArgs abbrevArgs argv))
         with e ->
-            stopProcessingRecovery e range0; exit 1;
+            stopProcessingRecovery e range0; 
+#if HOSTED_COMPILER
+            reraise()
+#else
+            exit 1
+#endif
         inputFilesAcc
 
 #if SILVERLIGHT
@@ -2203,6 +2213,8 @@ let internal StartStdinReadAndProcessThread
                 // to an error.  (CTRL-C is handled elsewhere.) 
                 // We'll only do this if we're running on Mono, "--gui" is specified and our input is piped in from stdin, so it's still
                 // fairly constrained.
+#if HOSTED_COMPILER
+#else
 #if SILVERLIGHT
 #else                                
                 if runningOnMono && fsiInteractionProcessor.FsiOptions.Gui then
@@ -2210,6 +2222,7 @@ let internal StartStdinReadAndProcessThread
                     Process.GetCurrentProcess().Kill()
                 else
                     exit 1
+#endif
 #endif                  
 
         ),Name="StdinReaderThread")
@@ -2386,7 +2399,12 @@ type FsiEvaluationSession (argv:string[], inReader:TextReader, outWriter:TextWri
       try 
           TcImports.BuildTcImports(tcConfigP) 
       with e -> 
-          stopProcessingRecovery e range0; exit 1
+          stopProcessingRecovery e range0; 
+#if HOSTED_COMPILER
+          reraise()
+#else
+          exit 1
+#endif
 #endif
 
     let ilGlobals  = tcGlobals.ilg

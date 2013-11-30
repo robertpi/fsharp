@@ -19,7 +19,7 @@
     <NoWarn>$(NoWarn);62;44</NoWarn>
     <AssemblyName>FSharp.Compiler.Hosted</AssemblyName>
     <BaseAddress>0x0A000000</BaseAddress>
-    <DefineConstants>EXTENSIONTYPING;COMPILER;EXTERNAL_EVENT_LOOP;$(DefineConstants)</DefineConstants>
+    <DefineConstants>EXTENSIONTYPING;COMPILER;EXTERNAL_EVENT_LOOP;HOSTED_COMPILER;$(DefineConstants)</DefineConstants>
     <AllowCrossTargeting>true</AllowCrossTargeting>
     <OtherFlags>$(OtherFlags) --warnon:1182</OtherFlags>
   </PropertyGroup>
